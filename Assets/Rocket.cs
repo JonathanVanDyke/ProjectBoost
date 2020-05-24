@@ -7,6 +7,7 @@ public class Rocket : MonoBehaviour
 {
     Rigidbody rigidBody;
     AudioSource audiosource;
+    TrailRenderer trailRenderer;
     enum RocketState {Thrusting, Grounded, Stalled};
     RocketState currentState = RocketState.Stalled;
 
@@ -15,7 +16,7 @@ public class Rocket : MonoBehaviour
     {
         rigidBody = GetComponent<Rigidbody>();
         audiosource = GetComponent<AudioSource>();
-        
+        trailRenderer = GetComponentInChildren<TrailRenderer>();
     }
 
     // Update is called once per frame
@@ -27,22 +28,36 @@ public class Rocket : MonoBehaviour
 
     private void ProcessInput()
     {
+        ThrustInputs();
+        RotateInputs();
+    }
+
+    private void ThrustInputs()
+    {
         var spacePressed = Input.GetKey(KeyCode.Space);
         var spaceUp = Input.GetKeyUp(KeyCode.Space);
-        var aPressed = Input.GetKey(KeyCode.A);
-        var dPressed = Input.GetKey(KeyCode.D);
 
         if (spacePressed)
         {
             rigidBody.AddRelativeForce(Vector3.up);
             currentState = RocketState.Thrusting;
+            //trailRenderer.enabled = true;
+            trailRenderer.time = 1;
         }
 
         if (spaceUp)
         {
             currentState = RocketState.Stalled;
+            //trailRenderer.enabled = false;
+            trailRenderer.time = 0;
         }
-        
+    }
+
+    private void RotateInputs()
+    {
+        var aPressed = Input.GetKey(KeyCode.A);
+        var dPressed = Input.GetKey(KeyCode.D);
+
         if (aPressed && !dPressed)
         {
             transform.Rotate(Vector3.forward);
@@ -70,4 +85,6 @@ public class Rocket : MonoBehaviour
                 break;
         }
     }
+
+
 }
