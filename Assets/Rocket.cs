@@ -5,11 +5,21 @@ using UnityEngine;
 
 public class Rocket : MonoBehaviour
 {
+    #region ExternalComponents
     Rigidbody rigidBody;
     AudioSource audiosource;
     TrailRenderer trailRenderer;
+    #endregion
+
+    #region Fields
+    [SerializeField] float thrust = 100f;
+    [SerializeField] float rotateMag = 100f;
+    #endregion
+
+    #region GameState
     enum RocketState {Thrusting, Grounded, Stalled};
     RocketState currentState = RocketState.Stalled;
+    #endregion
 
     // Start is called before the first frame update
     void Start()
@@ -32,6 +42,19 @@ public class Rocket : MonoBehaviour
         RotateInputs();
     }
 
+    private void OnCollisionEnter(Collision collision)
+    {
+        switch(collision.gameObject.tag)
+        {
+            case "Friendly":
+                print("OK"); 
+                break;
+            default:
+                print("dead");
+                break;
+        }
+    }
+
     private void ThrustInputs()
     {
         var spacePressed = Input.GetKey(KeyCode.Space);
@@ -39,34 +62,36 @@ public class Rocket : MonoBehaviour
 
         if (spacePressed)
         {
-            rigidBody.AddRelativeForce(Vector3.up);
+            rigidBody.AddRelativeForce(Vector3.up * thrust * Time.deltaTime);
             currentState = RocketState.Thrusting;
-            //trailRenderer.enabled = true;
             trailRenderer.time = 1;
         }
 
         if (spaceUp)
         {
             currentState = RocketState.Stalled;
-            //trailRenderer.enabled = false;
             trailRenderer.time = 0;
         }
     }
 
     private void RotateInputs()
     {
+
+        rigidBody.freezeRotation = true;
         var aPressed = Input.GetKey(KeyCode.A);
         var dPressed = Input.GetKey(KeyCode.D);
 
         if (aPressed && !dPressed)
         {
-            transform.Rotate(Vector3.forward);
+            transform.Rotate(Vector3.forward * rotateMag * Time.deltaTime);
         }
 
         if (dPressed && !aPressed)
         {
-            transform.Rotate(-Vector3.forward);
+            transform.Rotate(-Vector3.forward * rotateMag * Time.deltaTime);
         }
+        rigidBody.freezeRotation = false;
+        
     }
 
     private void AudioManager()
