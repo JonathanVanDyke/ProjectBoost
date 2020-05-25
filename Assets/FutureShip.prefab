@@ -3735,7 +3735,7 @@ GameObject:
   - component: {fileID: 1430245426188596158}
   m_Layer: 0
   m_Name: FutureShip
-  m_TagString: Untagged
+  m_TagString: Friendly
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3792,6 +3792,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   thrust: 100
   rotateMag: 250
+  mainEngine: {fileID: 8300000, guid: c8050a96c1c3c3c44a7a0dcfe96ddb1a, type: 3}
+  deathSound: {fileID: 8300000, guid: 91d34faa8d78a8f4ea93af51a3d90cd5, type: 3}
+  levelSound: {fileID: 8300000, guid: 518675dc1ee56454699b54b5a9004e40, type: 3}
 --- !u!82 &1430245426188596158
 AudioSource:
   m_ObjectHideFlags: 0
@@ -3802,7 +3805,7 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: de9b39600c368ff438834a4dad539a77, type: 3}
+  m_audioClip: {fileID: 0}
   m_PlayOnAwake: 0
   m_Volume: 0.379
   m_Pitch: 0.6

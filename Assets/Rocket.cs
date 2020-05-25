@@ -12,6 +12,9 @@ public class Rocket : MonoBehaviour
     #region Fields
     [SerializeField] float thrust = 100f;
     [SerializeField] float rotateMag = 100f;
+    [SerializeField] AudioClip mainEngine;
+    [SerializeField] AudioClip deathSound;
+    [SerializeField] AudioClip levelSound;
     #endregion
 
     #region GameState
@@ -57,12 +60,14 @@ public class Rocket : MonoBehaviour
             case "Finish":
                 print("Hit Finish");
                 state = State.Trancending;
+                audiosource.PlayOneShot(levelSound);
                 Invoke("LoadNextScene", 1f);
                 break;
             default:
                 print("Dead");
                 state = State.Dying;
                 audiosource.Stop();
+                audiosource.PlayOneShot(deathSound);
                 Invoke("ResetScene", 1f);
                 break;
         }
@@ -70,12 +75,15 @@ public class Rocket : MonoBehaviour
 
     private void ResetScene()
     {
+        audiosource.Stop();
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
     private void LoadNextScene()
     {
+        audiosource.Stop();
         SceneManager.LoadScene((SceneManager.GetActiveScene().buildIndex + 1) % SceneManager.sceneCountInBuildSettings);
+        state = State.Alive;
     }
 
     private void ThrustInputs()
@@ -125,7 +133,7 @@ public class Rocket : MonoBehaviour
                 if (!audiosource.isPlaying)
                 {
                     audiosource.volume = .379f;
-                    audiosource.Play();
+                    audiosource.PlayOneShot(mainEngine);
                 }
                 break;
             case RocketState.Stalled:
