@@ -12,6 +12,8 @@ public class Rocket : MonoBehaviour
     #region Fields
     [SerializeField] float thrust = 100f;
     [SerializeField] float rotateMag = 100f;
+    [SerializeField] float levelLoadDelay = 2f;
+
     [SerializeField] AudioClip mainEngine;
     [SerializeField] AudioClip deathSound;
     [SerializeField] AudioClip levelSound;
@@ -75,7 +77,7 @@ public class Rocket : MonoBehaviour
         audiosource.Stop();
         deathSoundParticles.Play();
         audiosource.PlayOneShot(deathSound);
-        Invoke("ResetScene", 1f);
+        Invoke("ResetScene", levelLoadDelay);
     }
 
     private void WinProcess()
@@ -83,7 +85,7 @@ public class Rocket : MonoBehaviour
         levelSoundParticles.Play();
         state = State.Trancending;
         audiosource.PlayOneShot(levelSound);
-        Invoke("LoadNextScene", 1f);
+        Invoke("LoadNextScene", levelLoadDelay);
     }
 
     private void ResetScene()
