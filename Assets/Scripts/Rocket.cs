@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class Rocket : MonoBehaviour
@@ -52,6 +53,15 @@ public class Rocket : MonoBehaviour
     {
         ThrustInputs();
         RotateInputs();
+        LevelSkipper();
+    }
+
+    private void LevelSkipper()
+    {
+        if (Input.GetKey(KeyCode.L))
+        {
+            LoadNextScene();
+        }
     }
 
     private void OnCollisionEnter(Collision collision)
@@ -131,7 +141,7 @@ public class Rocket : MonoBehaviour
     private void RotateInputs()
     {
 
-        rigidBody.freezeRotation = true;
+        rigidBody.angularVelocity = Vector3.zero;
         var aPressed = Input.GetKey(KeyCode.A);
         var dPressed = Input.GetKey(KeyCode.D);
 
@@ -144,7 +154,6 @@ public class Rocket : MonoBehaviour
         {
             transform.Rotate(-Vector3.forward * rotateMag * Time.deltaTime);
         }
-        rigidBody.freezeRotation = false;
         
     }
 
