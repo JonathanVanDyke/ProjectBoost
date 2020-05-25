@@ -17,6 +17,8 @@ public class Rocket : MonoBehaviour
     #region GameState
     enum RocketState {Thrusting, Grounded, Stalled};
     RocketState currentState = RocketState.Stalled;
+    enum State { Alive, Dying, Trancending }
+    State state = State.Alive;
     #endregion
 
     // Start is called before the first frame update
@@ -30,8 +32,11 @@ public class Rocket : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        ProcessInput();
-        AudioManager();
+        if (state == State.Alive)
+        {
+            ProcessInput();
+            AudioManager();
+        }
     }
 
     private void ProcessInput()
@@ -42,6 +47,8 @@ public class Rocket : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
+        if (state != State.Alive) { return; }
+
         switch(collision.gameObject.tag)
         {
             case "Friendly":
@@ -49,13 +56,26 @@ public class Rocket : MonoBehaviour
                 break;
             case "Finish":
                 print("Hit Finish");
-                SceneManager.LoadScene((SceneManager.GetActiveScene().buildIndex +1) % SceneManager.sceneCountInBuildSettings);
+                state = State.Trancending;
+                Invoke("LoadNextScene", 1f);
                 break;
             default:
                 print("Dead");
-                SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+                state = State.Dying;
+                audiosource.Stop();
+                Invoke("ResetScene", 1f);
                 break;
         }
+    }
+
+    private void ResetScene()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
+    private void LoadNextScene()
+    {
+        SceneManager.LoadScene((SceneManager.GetActiveScene().buildIndex + 1) % SceneManager.sceneCountInBuildSettings);
     }
 
     private void ThrustInputs()
