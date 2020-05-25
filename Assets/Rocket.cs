@@ -15,6 +15,10 @@ public class Rocket : MonoBehaviour
     [SerializeField] AudioClip mainEngine;
     [SerializeField] AudioClip deathSound;
     [SerializeField] AudioClip levelSound;
+
+    [SerializeField] ParticleSystem mainEngineParticles;
+    [SerializeField] ParticleSystem deathSoundParticles;
+    [SerializeField] ParticleSystem levelSoundParticles;
     #endregion
 
     #region GameState
@@ -55,33 +59,44 @@ public class Rocket : MonoBehaviour
         switch(collision.gameObject.tag)
         {
             case "Friendly":
-                print("OK"); 
                 break;
             case "Finish":
-                print("Hit Finish");
-                state = State.Trancending;
-                audiosource.PlayOneShot(levelSound);
-                Invoke("LoadNextScene", 1f);
+                WinProcess();
                 break;
             default:
-                print("Dead");
-                state = State.Dying;
-                audiosource.Stop();
-                audiosource.PlayOneShot(deathSound);
-                Invoke("ResetScene", 1f);
+                DeathProcess();
                 break;
         }
+    }
+
+    private void DeathProcess()
+    {
+        state = State.Dying;
+        audiosource.Stop();
+        deathSoundParticles.Play();
+        audiosource.PlayOneShot(deathSound);
+        Invoke("ResetScene", 1f);
+    }
+
+    private void WinProcess()
+    {
+        levelSoundParticles.Play();
+        state = State.Trancending;
+        audiosource.PlayOneShot(levelSound);
+        Invoke("LoadNextScene", 1f);
     }
 
     private void ResetScene()
     {
         audiosource.Stop();
+        deathSoundParticles.Stop();
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
     private void LoadNextScene()
     {
         audiosource.Stop();
+        levelSoundParticles.Stop();
         SceneManager.LoadScene((SceneManager.GetActiveScene().buildIndex + 1) % SceneManager.sceneCountInBuildSettings);
         state = State.Alive;
     }
@@ -93,9 +108,7 @@ public class Rocket : MonoBehaviour
 
         if (spacePressed)
         {
-            rigidBody.AddRelativeForce(Vector3.up * thrust * Time.deltaTime);
-            currentState = RocketState.Thrusting;
-            trailRenderer.time = 1;
+            ApplyThrust();
         }
 
         if (spaceUp)
@@ -103,6 +116,14 @@ public class Rocket : MonoBehaviour
             currentState = RocketState.Stalled;
             trailRenderer.time = 0;
         }
+    }
+
+    private void ApplyThrust()
+    {
+        rigidBody.AddRelativeForce(Vector3.up * thrust * Time.deltaTime);
+        currentState = RocketState.Thrusting;
+        trailRenderer.time = 1;
+        mainEngineParticles.Play();
     }
 
     private void RotateInputs()
@@ -138,6 +159,7 @@ public class Rocket : MonoBehaviour
                 break;
             case RocketState.Stalled:
                 audiosource.Stop();
+                mainEngineParticles.Stop();
                 break;
         }
     }
